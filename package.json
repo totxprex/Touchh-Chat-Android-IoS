@@ -1,0 +1,36 @@
+{
+  "name": "touchh-mobile-backend-node",
+  "version": "1.0.0",
+  "description": "Touchh React Native Android and IoS",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "keywords": [
+    "chat",
+    "mobile",
+    "react-native"
+  ],
+  "author": "Tolulope Mumuney",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.204.0",
+    "@aws-sdk/s3-request-presigner": "^3.204.0",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "helmet": "^6.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.13.15",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.8.0",
+    "sharp": "^0.31.2",
+    "validator": "^13.7.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}

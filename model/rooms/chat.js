@@ -81,24 +81,50 @@ chatApp.post("/send/message/:roomID", upload.single("image"), async (req, res) =
 
 //delete a message
 chatApp.delete("/delete/message/:roomID/:messageID", async (req, res) => {
-  const message = req.params.messageID
-  const room = req.params.roomID
+  try {
+    const message = req.params.messageID
+    const room = req.params.roomID
 
-  const { messages } = await dbRooms.findById(room)
+    const { messages } = await dbRooms.findById(room)
 
-  const newMesages = messages.filter((e) => {
-    return String(e._id) !== message
-  })
+    const newMesages = messages.filter((e) => {
+      return String(e._id) !== message
+    })
 
-  await dbRooms.findByIdAndUpdate(room, { messages: newMesages })
+    await dbRooms.findByIdAndUpdate(room, { messages: newMesages })
 
-  responce(res, "Message deleted")
+    responce(res, "Message deleted")
+  }
+
+  catch (err) {
+    errorResponce(res, `${err || "Server error"}`)
+  }
 
 })
 
 
 
 //Get a room
+chatApp.get("/get/room/:roomID", async (req, res) => {
+  try {
+    const roomID = req.params.roomID
+
+    const startFinding = dbRooms.findById(roomID).populate({
+      path: "firstUser",
+      select: "name username photo gender"
+    }).populate({
+      path: "secondUser",
+      select: "name username photo gender"
+    })
+
+    const room = await startFinding
+
+    responce(res, "Found room", room)
+  }
+  catch (err) {
+    errorResponce(res, `${err || "Server error"}`)
+  }
+})
 
 
 

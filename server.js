@@ -8,8 +8,8 @@ const cors = require("cors")
 
 
 const app = express()
-app.listen(5500, process.env.TestSeverURL, () => {
-  console.log(`Server started at ${process.env.TestSeverURL}`)
+app.listen(process.env.port, () => {
+  console.log(`Server started at ${process.env.port}`)
 })
 
 

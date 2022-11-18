@@ -9,7 +9,7 @@ const cors = require("cors")
 
 const app = express()
 app.listen(process.env.PORT, () => {
-  console.log(`Server started at ${process.env.port}`)
+  console.log(`Server started`)
 })
 
 
@@ -29,7 +29,7 @@ const { newsApp } = require("./model/news/news.js")
 const { updateUser } = require("./user/user-update.js")
 
 
-mongoose.connect(process.env.mongoDB, {
+mongoose.connect("mongodb+srv://totxprex:ajmclean@cluster0.qqqiapj.mongodb.net/Touchh-Mobile?retryWrites=true&w=majority", {
   useCreateIndex: true,
   useFindAndModify: false,
   useUnifiedTopology: true,

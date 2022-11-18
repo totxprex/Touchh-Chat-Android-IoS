@@ -1,5 +1,5 @@
 const dotenv = require("dotenv")
-// dotenv.config({ path: "./config.env" })
+dotenv.config({ path: "./config.env" })
 const express = require("express")
 const mongoose = require("mongoose")
 const morgan = require("morgan")
@@ -28,13 +28,11 @@ const { chatApp } = require("./model/rooms/chat.js")
 const { newsApp } = require("./model/news/news.js")
 const { updateUser } = require("./user/user-update.js")
 
-console.log(process.env.mongodb)
 
-mongoose.connect(process.env.mongodb, {
+mongoose.connect(process.env.MONGO_URL, {
   useCreateIndex: true,
   useFindAndModify: false,
-  useUnifiedTopology: true,
-  useNewUrlParser: true
+  useUnifiedTopology: true
 }).then(() => console.log("Mongoose database connected")).catch((err) => console.log(err))
 
 app.use(cors({

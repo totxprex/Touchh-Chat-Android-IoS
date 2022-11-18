@@ -29,12 +29,7 @@ const { newsApp } = require("./model/news/news.js")
 const { updateUser } = require("./user/user-update.js")
 
 
-mongoose.connect(process.env.MONGO_URL, {
-  useCreateIndex: true,
-  useFindAndModify: false,
-  useUnifiedTopology: true,
-  useNewUrlParser: true
-}).then(() => console.log("Mongoose database connected")).catch((err) => console.log(err))
+mongoose.connect(process.env.MONGO_URL).then(() => console.log("Mongoose database connected")).catch((err) => console.log(err))
 
 app.use(cors({
   methods: ["POST", "GET", "PATCH", "PUT"],

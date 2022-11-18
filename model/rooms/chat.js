@@ -24,9 +24,9 @@ chatApp.get("/create/:firstUserID/:secondUserID", async (req, res) => {
       secondUser: secondUserId
     }
 
-    await dbRooms.create(obj)
+    const room = await dbRooms.create(obj)
 
-    responce(res, "Room created")
+    responce(res, "Room created", room._id)
 
   }
 
@@ -42,6 +42,7 @@ chatApp.get("/create/:firstUserID/:secondUserID", async (req, res) => {
 chatApp.post("/send/message/:roomID", upload.single("image"), async (req, res) => {
 
   const messageObj = req.body
+  const userSendingtheMessageUsername = req.body.senderUsername
 
   try {
     if (req.file?.buffer) {
@@ -63,11 +64,35 @@ chatApp.post("/send/message/:roomID", upload.single("image"), async (req, res) =
 
     }
 
-    const { messages } = await dbRooms.findById(req.params.roomID)
+    const { messages, firstUser, secondUser } = await dbRooms.findById(req.params.roomID)
 
     messages.push(messageObj)
 
     await dbRooms.findByIdAndUpdate(req.params.roomID, { messages: messages }, { runValidators: true })
+
+
+    //mark message for other user as unread by adding the room id to the users unread arr if not there
+    const userOne = await dbUsers.findById(firstUser)
+    const userTwo = await dbUsers.findById(secondUser)
+
+    let theUserToSendUnread
+
+    if (userOne.username !== userSendingtheMessageUsername) theUserToSendUnread = userOne._id
+
+    if (userTwo.username !== userSendingtheMessageUsername) theUserToSendUnread = userTwo._id
+
+
+    const { unReadRooms } = await dbUsers.findById(theUserToSendUnread)
+
+    const confirmIfNotThereFirt = unReadRooms.find((e) => {
+      return String(e) == req.params.roomID
+    })
+
+    if (!confirmIfNotThereFirt) {
+      unReadRooms.push(req.params.roomID)
+      await dbUsers.findByIdAndUpdate(theUserToSendUnread, { unReadRooms: unReadRooms }, { runValidators: true })
+    }
+
 
     responce(res, "Messages sent")
   }
@@ -121,6 +146,33 @@ chatApp.get("/get/room/:roomID", async (req, res) => {
 
     responce(res, "Found room", room)
   }
+  catch (err) {
+    errorResponce(res, `${err || "Server error"}`)
+  }
+})
+
+
+
+
+//mark all messages in a room as read for a particlular user
+chatApp.get("/read/room/:roomID/:userID", async (req, res) => {
+
+  try {
+    const room = req.params.roomID
+    const user = req.params.userID
+
+    let { unReadRooms } = await dbUsers.findById(user)
+
+    unReadRooms = unReadRooms.filter((e) => {
+      return String(e) !== room
+    })
+
+    await dbUsers.findByIdAndUpdate(user, { unReadRooms: unReadRooms }, { runValidators: true })
+
+    responce(res, "Message marked as read for user")
+
+  }
+
   catch (err) {
     errorResponce(res, `${err || "Server error"}`)
   }

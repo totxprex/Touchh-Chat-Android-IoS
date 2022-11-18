@@ -1,7 +1,7 @@
 const express = require("express")
 const { responce } = require("../../server-responce/success.js")
 const { errorResponce } = require("../../server-responce/error.js")
-const { dbUsers } = require("../../database/schemas.js")
+const { dbUsers, dbRooms } = require("../../database/schemas.js")
 
 
 const contactApp = express()
@@ -77,10 +77,6 @@ contactApp.patch("/request/:recieverID/:userRequestingId", async (req, res) => {
 
     const { addRequests, name } = await dbUsers.findById(user)
 
-    addRequests.find((e) => {
-      if (e.fromUsername === userRequestingDetails.username) throw new Error("Request already sent previously")
-    })
-
     addRequests.push(requestObj)
 
     await dbUsers.findByIdAndUpdate(user, { addRequests: addRequests }, { runValidators: true })
@@ -122,6 +118,84 @@ contactApp.delete("/delete/:userID/:requestID", async (req, res) => {
 
 })
 
+
+
+
+//remove a user from your contact list
+contactApp.patch("/remove/contact/:userID/:toBeRemovedID", async (req, res) => {
+  try {
+    const userId = req.params.userID
+    const toBeRemovedId = req.params.toBeRemovedID
+
+    const userFirst = await dbUsers.findById(userId)
+    const userSecond = await dbUsers.findById(toBeRemovedId)
+
+    const userFistMod = userFirst.contactList.filter((e) => String(e) !== toBeRemovedId)
+
+    const userSecondMod = userSecond.contactList.filter((e) => String(e) !== userId)
+
+    await dbUsers.findByIdAndUpdate(userId, { contactList: userFistMod }, { runValidators: true })
+
+    await dbUsers.findByIdAndUpdate(toBeRemovedId, { contactList: userSecondMod }, { runValidators: true })
+
+
+    //find the room they have in common in rooms collection
+    let roomIdToKill
+
+    const startFindingRoomCheckOne = dbUsers.findById(userId).populate("rooms")
+
+    const roomCheckOne = await startFindingRoomCheckOne
+
+    roomCheckOne.rooms.forEach((e) => {
+      if (String(e.firstUser) == userId && String(e.secondUser) == toBeRemovedId) roomIdToKill = String(e._id)
+    })
+
+    roomCheckOne.rooms.forEach((e) => {
+      if (String(e.firstUser) == toBeRemovedId && String(e.secondUser) == userId) roomIdToKill = String(e._id)
+    })
+
+
+
+    //delete room in both users array
+    const userFirtRoomsMod = userFirst.rooms.filter((el) => {
+
+      return String(el) !== roomIdToKill
+    })
+
+    const userSecondRoomsMod = userSecond.rooms.filter((el) => {
+
+      return String(el) !== roomIdToKill
+    })
+
+
+    const userFirtUnReadMod = userFirst.unReadRooms.filter((el) => {
+
+      return String(el) !== roomIdToKill
+    })
+
+    const userSecondUnReadMod = userSecond.unReadRooms.filter((el) => {
+
+      return String(el) !== roomIdToKill
+    })
+
+
+    await dbUsers.findByIdAndUpdate(userId, { rooms: userFirtRoomsMod, unReadRooms: userFirtUnReadMod }, { runValidators: true })
+
+    await dbUsers.findByIdAndUpdate(toBeRemovedId, { rooms: userSecondRoomsMod, unReadRooms: userSecondUnReadMod }, { runValidators: true })
+
+
+    //delete room in rooms collection
+    await dbRooms.findByIdAndDelete(roomIdToKill)
+
+
+    responce(res, "User removed from contact list")
+  }
+
+  catch (err) {
+    errorResponce(res, `${err || "Server error"}`)
+  }
+
+})
 
 
 module.exports = { contactApp }

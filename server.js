@@ -29,7 +29,7 @@ const { newsApp } = require("./model/news/news.js")
 const { updateUser } = require("./user/user-update.js")
 
 
-mongoose.connect("mongodb+srv://totxprex:ajmclean@cluster0.qqqiapj.mongodb.net/Touchh-Mobile?retryWrites=true&w=majority", {
+mongoose.connect(process.env.mongoDB, {
   useCreateIndex: true,
   useFindAndModify: false,
   useUnifiedTopology: true,

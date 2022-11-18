@@ -45,6 +45,10 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "rooms"
   }],
+  unReadRooms: [{
+    type: mongoose.Schema.ObjectId,
+    ref: "rooms"
+  }],
   createdAt: {
     type: Date,
     default: Date.now()
@@ -74,7 +78,13 @@ const userSchema = new mongoose.Schema({
         message: "Failed to send request"
       }
     }
-  }]
+  }],
+  about: {
+    type: String,
+    maxlength: 200,
+    default: ""
+  },
+  savedNews: [Object]
 })
 
 
@@ -190,6 +200,7 @@ socketSchema.index({ username: 1 }, { unique: true })
 const dbUsers = mongoose.model("users", userSchema)
 const dbRooms = mongoose.model("rooms", roomsSchema)
 const dbSockets = mongoose.model("sockets", socketSchema)
+
 
 
 module.exports = { dbUsers, dbRooms, dbSockets }

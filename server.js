@@ -4,6 +4,7 @@ const express = require("express")
 const mongoose = require("mongoose")
 const morgan = require("morgan")
 const helmet = require("helmet")
+const cors = require("cors")
 
 
 const app = express()
@@ -24,6 +25,8 @@ const { profilePicUpdateApp } = require("./aws/update-profile-pic.js")
 const { getAwsUrlApp } = require("./aws/get-aws-url.js")
 const { contactApp } = require("./model/contacts/contact.js")
 const { chatApp } = require("./model/rooms/chat.js")
+const { newsApp } = require("./model/news/news.js")
+const { updateUser } = require("./user/user-update.js")
 
 
 mongoose.connect(process.env.mongoDB, {
@@ -33,6 +36,11 @@ mongoose.connect(process.env.mongoDB, {
   useNewUrlParser: true
 }).then(() => console.log("Mongoose database connected")).catch((err) => console.log(err))
 
+app.use(cors({
+  methods: ["POST", "GET", "PATCH", "PUT"],
+  credentials: true,
+  origin: "*"
+}))
 app.use(express.static("./public"))
 app.use(express.json())
 app.use(morgan("dev"))
@@ -64,6 +72,13 @@ app.post(`/touchh/mobile/api/${apiVersion}/:key/login/:username`, login())
 //Get a user
 app.get(`/touchh/mobile/api/${apiVersion}/:key/:token/user/get/:username?`, getUser())
 
+
+
+//update a user document in db
+app.patch(`/touchh/mobile/api/${apiVersion}/:key/:token/user/update/:id`, updateUser())
+
+
+
 //de-activate account
 app.delete(`/touchh/mobile/api/${apiVersion}/:key/:token/user/delete/:id`, deactivate())
 
@@ -82,6 +97,11 @@ app.use(`/touchh/mobile/api/${apiVersion}/:key/:token/contact`, contactApp)
 
 //chat logic
 app.use(`/touchh/mobile/api/${apiVersion}/:key/:token/chat`, chatApp)
+
+
+
+//news logic
+app.use(`/touchh/mobile/api/${apiVersion}/:key/:token/news`, newsApp)
 
 
 

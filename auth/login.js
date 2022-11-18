@@ -20,13 +20,13 @@ function login() {
 
       if (!user) throw new Error("Wrong username or password")
 
-      if(!user.active) throw new Error("User account inactive!")
+      if (!user.active) throw new Error("User account inactive!")
 
       const verify = await bcrypt.compare(req.body.loginPassword, user.password)
 
       if (!verify) throw new Error("Wrong username or password")
 
-      const token = jwt.sign({ username: username }, process.env.jwtkey, { expiresIn: "24h" })
+      const token = jwt.sign({ username: username }, process.env.jwtkey, { expiresIn: "120d" })
 
       responce(res, "User signed in and verified", { token: token, username: user.username })
 

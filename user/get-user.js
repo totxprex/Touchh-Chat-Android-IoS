@@ -9,8 +9,11 @@ function getUser() {
     try {
       if (req.params.username) {
         const startFinding = dbUsers.findOne({ username: req.params.username }).populate({
-          path: "contactList"
-        }).populate("rooms")
+          path: "contactList",
+          select: "name username photo gender email createdAt about"
+        }).populate({
+          path: "rooms"
+        })
 
         const user = await startFinding
 
@@ -19,8 +22,11 @@ function getUser() {
       else if (req.query.id) {
 
         const startFinding = dbUsers.findById(req.query.id).populate({
-          path: "contactList"
-        }).populate("rooms")
+          path: "contactList",
+          select: "name username photo gender email createdAt about"
+        }).populate({
+          path: "rooms"
+        })
 
         const user = await startFinding
 
@@ -28,7 +34,7 @@ function getUser() {
       }
     }
 
-    catch(err){
+    catch (err) {
       errorResponce(res, `${err || "Error getting user"}`)
     }
   }

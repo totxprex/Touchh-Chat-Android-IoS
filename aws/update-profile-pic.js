@@ -33,7 +33,7 @@ profilePicUpdateApp.patch("/:username", upload.single("photo"), async (req, res)
       Body: buffer,
       mimetype: req.file.mimetype
     })
-    
+
     await s3.send(command)
 
     await dbUsers.findOneAndUpdate({ username: req.params.username }, { photo: filename }, { runValidators: true })

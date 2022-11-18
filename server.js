@@ -28,6 +28,7 @@ const { chatApp } = require("./model/rooms/chat.js")
 const { newsApp } = require("./model/news/news.js")
 const { updateUser } = require("./user/user-update.js")
 
+console.log(process.env.mongodb)
 
 mongoose.connect(process.env.mongodb, {
   useCreateIndex: true,

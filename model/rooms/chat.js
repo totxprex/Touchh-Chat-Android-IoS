@@ -94,7 +94,7 @@ chatApp.post("/send/message/:roomID", upload.single("image"), async (req, res) =
     }
 
 
-    responce(res, "Messages sent")
+    responce(res, "Messages sent", messageObj)
   }
 
   catch (err) {
